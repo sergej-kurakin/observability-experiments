@@ -1,0 +1,71 @@
+extensions:
+  health_check:
+  # pprof:
+  #   endpoint: 0.0.0.0:1777
+  # zpages:
+  #   endpoint: 0.0.0.0:55679
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: 0.0.0.0:4317
+      http:
+        endpoint: 0.0.0.0:4318
+  # opencensus:
+  #   endpoint: 0.0.0.0:55678
+  # prometheus:
+  #   config:
+  #     scrape_configs:
+  #     - job_name: 'otel-collector'
+  #       scrape_interval: 10s
+  #       static_configs:
+  #       - targets: ['0.0.0.0:8888']
+  # jaeger:
+  #   protocols:
+  #     grpc:
+  #       endpoint: 0.0.0.0:14250
+  #     thrift_binary:
+  #       endpoint: 0.0.0.0:6832
+  #     thrift_compact:
+  #       endpoint: 0.0.0.0:6831
+  #     thrift_http:
+  #       endpoint: 0.0.0.0:14268
+  # zipkin:
+  #   endpoint: 0.0.0.0:9411
+
+processors: 
+  batch:
+
+exporters:
+  # debug:
+  #   verbosity: detailed
+  otlp: 
+    endpoint: "${env:APMSERVER_HOST}:${env:APMSERVER_PORT}"
+    tls:
+      insecure: true
+    headers:
+      Authorization: "Bearer ${env:ELASTIC_APM_SECRET_TOKEN}"
+service:
+
+  pipelines:
+
+    traces:
+      # receivers: [otlp, opencensus, jaeger, zipkin]
+      receivers: [otlp]
+      processors: [batch]
+      # exporters: [debug]
+      exporters: [otlp]
+
+    # metrics:
+    #   receivers: [otlp, opencensus, prometheus]
+    #   processors: [batch]
+    #   exporters: [debug]
+
+    # logs:
+    #   receivers: [otlp]
+    #   processors: [batch]
+    #   exporters: [debug]
+
+  # extensions: [health_check, pprof, zpages]
+  extensions: [health_check]
