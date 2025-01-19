@@ -139,3 +139,16 @@ services:
       - elasticsearch
       - apm-server
   
+  goapp:
+    build:
+      context: goapp/
+    ports:
+      - 3010:3010
+    environment:
+      ELASTIC_APM_SERVICE_NAME: goapp
+      ELASTIC_APM_SECRET_TOKEN: ${ELASTIC_APM_SECRET_TOKEN}
+      ELASTIC_APM_SERVER_URL: http://${APMSERVER_HOST}:${APMSERVER_PORT}
+    depends_on:
+      - elasticsearch
+      - apm-server
+
