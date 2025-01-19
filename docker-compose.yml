@@ -4,7 +4,7 @@ version: '3.5'
 networks:
   default:
     name: elastic
-    external: true
+    # external: true
 
 # will contain all elasticsearch data.
 volumes:
