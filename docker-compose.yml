@@ -152,3 +152,17 @@ services:
       - elasticsearch
       - apm-server
 
+  goappotel:
+    build:
+      context: goappotel/
+    ports:
+      - 3020:3020
+    environment:
+      OTEL_SERVICE_NAME: goappotel
+      OTEL_TRACES_EXPORTER: otlp
+      OTEL_EXPORTER_OTLP_HEADERS: "Authorization=Bearer ${ELASTIC_APM_SECRET_TOKEN}"
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://${APMSERVER_HOST}:${APMSERVER_PORT}
+    depends_on:
+      - elasticsearch
+      - apm-server
+
