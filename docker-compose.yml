@@ -186,3 +186,16 @@ services:
       - elasticsearch
       - apm-server
 
+  goappotel-collector:
+    build:
+      context: goappotel/
+    ports:
+      - 3030:3020
+    environment:
+      OTEL_SERVICE_NAME: goappotel-collector
+      OTEL_TRACES_EXPORTER: otlp
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+    depends_on:
+      - elasticsearch
+      - apm-server
+      - otel-collector
