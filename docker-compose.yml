@@ -199,3 +199,23 @@ services:
       - elasticsearch
       - apm-server
       - otel-collector
+
+  phphttp:
+    image: nginx:latest
+    ports:
+      - '8080:80'
+    volumes:
+      - ./phpapp:/var/www/html
+      - ./phphttp/default.conf:/etc/nginx/conf.d/default.conf 
+    depends_on:
+      - phpapp
+
+  phpapp:
+    build:
+      context: phpapp/
+    volumes:
+      - ./phpapp:/var/www/html
+    depends_on:
+      - elasticsearch
+      - apm-server
+      - otel-collector
