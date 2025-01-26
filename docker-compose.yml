@@ -215,6 +215,11 @@ services:
       context: phpapp/
     volumes:
       - ./phpapp:/var/www/html
+    environment:
+      OTEL_PHP_AUTOLOAD_ENABLED: true
+      OTEL_TRACES_EXPORTER: console
+      OTEL_METRICS_EXPORTER: none
+      OTEL_LOGS_EXPORTER: none
     depends_on:
       - elasticsearch
       - apm-server
