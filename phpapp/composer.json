@@ -9,6 +9,7 @@
         "ext-iconv": "*",
         "nyholm/psr7": "^1.8",
         "open-telemetry/exporter-otlp": "^1.2",
+        "open-telemetry/opentelemetry-auto-symfony": "1.0.0beta30",
         "open-telemetry/sdk": "^1.2",
         "open-telemetry/transport-grpc": "^1.1",
         "symfony/console": "7.2.*",
