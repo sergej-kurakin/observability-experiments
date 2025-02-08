@@ -12,6 +12,8 @@ class DemoController extends AbstractController
 {
     private TracerInterface $tracer;
 
+    // public function __construct(private TracerInterface $tracer) {}
+
 
     #[Route('/demo', name: 'demo')]
     public function index(): Response
@@ -28,11 +30,21 @@ class DemoController extends AbstractController
             usleep(1000);
             $this->runCache();
 
+            $curlResult = $this->callOtherServiceWithCurl();
+
+            $guzzleResult = $this->callOtherServiceWithGuzzle();
+
+            $httpClient = $this->callOtherServiceWithHttpClient();
+
             $rootScope->detach();
             $span->end();
         }
 
-        return new Response('Hello World');
+        return new Response(
+            'Hello World'."\n\n".$curlResult."\n\n".$guzzleResult."\n\n".$httpClient,
+            Response::HTTP_OK,
+            ['content-type' => 'text/plain']
+        );
     }
 
     private function runRequest(): void
@@ -69,5 +81,57 @@ class DemoController extends AbstractController
         }
         $scope->detach();
         $span->end();
+    }
+
+    private function callOtherServiceWithCurl(): string
+    {
+        $span = $this->tracer->spanBuilder('my-curl')->startSpan();
+        $scope = $span->activate();
+        
+        $handle = curl_init('http://goappotel-collector:3020/ping');
+        curl_setopt($handle, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($handle, CURLOPT_HTTPGET, true);
+        $result = curl_exec($handle);
+
+        if (curl_errno($handle)) {
+            throw new \RuntimeException(curl_error($handle));
+        }
+
+        curl_close($handle);
+
+        $scope->detach();
+        $span->end();
+
+        return $result;
+    }
+
+    private function callOtherServiceWithGuzzle(): string
+    {
+        $span = $this->tracer->spanBuilder('my-guzzle')->startSpan();
+        $scope = $span->activate();
+
+        $client = new \GuzzleHttp\Client();
+        $response = $client->request('GET', 'http://goappotel:3020/ping');
+        $result = $response->getBody()->getContents();
+
+        $scope->detach();
+        $span->end();
+
+        return $result;
+    }
+
+    private function callOtherServiceWithHttpClient(): string
+    {
+        $span = $this->tracer->spanBuilder('my-http-client')->startSpan();
+        $scope = $span->activate();
+
+        $client = \Symfony\Component\HttpClient\HttpClient::create();
+        $response = $client->request('GET', 'http://goappotel-collector:3020/ping');
+        $result = $response->getContent();
+
+        $scope->detach();
+        $span->end();
+
+        return $result;
     }
 }
