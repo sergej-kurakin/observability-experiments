@@ -33,8 +33,6 @@ class DemoController extends AbstractController
     #[Route('/demo', name: 'demo')]
     public function index(): Response
     {
-        $this->setupOtelSDK();
-
         $this->tracer = Globals::tracerProvider()->getTracer('demo');
 
         {
@@ -52,36 +50,6 @@ class DemoController extends AbstractController
         }
 
         return new Response('Hello World');
-    }
-
-    private function setupOtelSDK(): void
-    {
-        $resource = ResourceInfoFactory::emptyResource()->merge(ResourceInfo::create(Attributes::create([
-            ResourceAttributes::SERVICE_NAMESPACE => 'demo',
-            ResourceAttributes::SERVICE_NAME => 'test-application',
-            ResourceAttributes::SERVICE_VERSION => '0.1',
-            ResourceAttributes::DEPLOYMENT_ENVIRONMENT_NAME => 'development',
-        ])));
-
-        $transport = (new GrpcTransportFactory())
-            ->create('http://otel-collector:4317' . OtlpUtil::method(Signals::TRACE));
-        $exporter = new SpanExporter($transport);
-
-        // $exporter = new SpanExporter(
-        //     (new StreamTransportFactory())->create('php://stdout', 'application/json')
-        // );
-
-        $tracerProvider =  new TracerProvider(
-            new SimpleSpanProcessor($exporter),
-            null,
-            $resource
-        );
-
-        Sdk::builder()
-            ->setTracerProvider($tracerProvider)
-            ->setPropagator(TraceContextPropagator::getInstance())
-            ->setAutoShutdown(true)
-            ->buildAndRegisterGlobal();
     }
 
     private function runRequest(): void
