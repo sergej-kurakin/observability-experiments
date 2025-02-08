@@ -217,9 +217,12 @@ services:
       - ./phpapp:/var/www/html
     environment:
       OTEL_PHP_AUTOLOAD_ENABLED: true
-      OTEL_TRACES_EXPORTER: console
+      OTEL_SERVICE_NAME: phpapp-ext
       OTEL_METRICS_EXPORTER: none
       OTEL_LOGS_EXPORTER: none
+      OTEL_TRACES_EXPORTER: otlp
+      OTEL_EXPORTER_OTLP_PROTOCOL: grpc
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
     depends_on:
       - elasticsearch
       - apm-server
