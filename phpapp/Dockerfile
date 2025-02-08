@@ -13,6 +13,7 @@ RUN docker-php-ext-install pdo pdo_mysql mysqli gd opcache intl zip calendar dom
 RUN pecl install apcu && docker-php-ext-enable apcu
 RUN pecl install opentelemetry && docker-php-ext-enable opentelemetry
 RUN pecl install grpc && docker-php-ext-enable grpc
+RUN pecl install protobuf && docker-php-ext-enable protobuf
 
 RUN mkdir -p /var/www/html
 
