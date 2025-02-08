@@ -162,6 +162,7 @@ services:
       OTEL_TRACES_EXPORTER: otlp
       OTEL_EXPORTER_OTLP_HEADERS: "Authorization=Bearer ${ELASTIC_APM_SECRET_TOKEN}"
       OTEL_EXPORTER_OTLP_ENDPOINT: http://${APMSERVER_HOST}:${APMSERVER_PORT}
+      OTEL_RESOURCE_ATTRIBUTES: "deployment.environment.name=development"
     depends_on:
       - elasticsearch
       - apm-server
@@ -195,6 +196,7 @@ services:
       OTEL_SERVICE_NAME: goappotel-collector
       OTEL_TRACES_EXPORTER: otlp
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
+      OTEL_RESOURCE_ATTRIBUTES: "deployment.environment.name=development"
     depends_on:
       - elasticsearch
       - apm-server
@@ -223,6 +225,8 @@ services:
       OTEL_TRACES_EXPORTER: otlp
       OTEL_EXPORTER_OTLP_PROTOCOL: grpc
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      OTEL_PROPAGATORS: baggage,tracecontext
+      OTEL_RESOURCE_ATTRIBUTES: "deployment.environment.name=development"
     depends_on:
       - elasticsearch
       - apm-server
