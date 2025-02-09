@@ -24,6 +24,10 @@ class DemoController extends AbstractController
             $span = $this->tracer
                 ->spanBuilder('manual-span')
                 ->startSpan();
+
+            $traceId = $span->getContext()->getTraceId();
+            $spanId = $span->getContext()->getSpanId();
+
             $rootScope = $span->activate();
 
             $this->runRequest();
@@ -41,7 +45,12 @@ class DemoController extends AbstractController
         }
 
         return new Response(
-            'Hello World'."\n\n".$curlResult."\n\n".$guzzleResult."\n\n".$httpClient,
+            'Hello World'."\n\n".
+                'Trace ID: '.$traceId."\n\n".
+                'Span ID: '.$spanId."\n\n".
+                $curlResult."\n\n".
+                $guzzleResult."\n\n".
+                $httpClient,
             Response::HTTP_OK,
             ['content-type' => 'text/plain']
         );
@@ -111,7 +120,7 @@ class DemoController extends AbstractController
         $scope = $span->activate();
 
         $client = new \GuzzleHttp\Client();
-        $response = $client->request('GET', 'http://goappotel:3020/ping');
+        $response = $client->request('GET', 'http://goappotel-collector:3020/ping');
         $result = $response->getBody()->getContents();
 
         $scope->detach();
