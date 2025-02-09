@@ -198,6 +198,8 @@ services:
       OTEL_TRACES_EXPORTER: otlp
       OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4318
       OTEL_RESOURCE_ATTRIBUTES: "deployment.environment.name=development"
+      OTEL_PROPAGATORS: baggage,tracecontext
+      OTEL_TRACES_SAMPLER: parentbased_always_on
     depends_on:
       - elasticsearch
       - apm-server
