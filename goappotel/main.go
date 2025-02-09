@@ -10,6 +10,7 @@ import (
 
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
@@ -59,6 +60,8 @@ func main() {
 	defer func() { _ = tp.Shutdown(ctx) }()
 
 	otel.SetTracerProvider(tp)
+	tc := propagation.TraceContext{}
+	otel.SetTextMapPropagator(tc)
 
 	tracer = tp.Tracer("goappotel")
 
@@ -71,8 +74,17 @@ func main() {
 		anotherSleep(ctx)
 		doSomeSleep(ctx)
 
+		headers := c.Request.Header
+
+		span := trace.SpanFromContext(ctx)
+		traceId := span.SpanContext().TraceID().String()
+		spanId := span.SpanContext().SpanID().String()
+
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",
+			"headers": headers,
+			"traceId": traceId,
+			"spanId":  spanId,
 		})
 	})
 	r.Run(":3020")
